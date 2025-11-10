@@ -1,11 +1,43 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Variables
   const galeria = document.querySelector(".galeria");
+  const formulario = document.querySelector(".nav__busqueda");
   let coleccionesFiltradas = [];
   let categoriasRandom = [];
   const fragment = document.createDocumentFragment();
   const PEXELS_API_KEY =
     "ZOVklWfofO0RAya4Id41GDeAMk4RS3ga4NWRljgtcElZFXdkiyv5Iaeu";
+
+  // Eventos
+  formulario.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+
+    let busqueda = formulario.elements["search"];
+
+    if (validar(busqueda.value)) {
+      obtenerImagenes(busqueda.value);
+      const botoneraExistente = document.querySelector(".botonera");
+      if (botoneraExistente) botoneraExistente.remove();
+    } else {
+      busqueda.placeholder = "Ingresa un dato correcto...";
+      busqueda.classList.toggle("busqueda--error");
+
+      setTimeout(() => {
+        busqueda.classList.toggle("busqueda--error");
+        busqueda.placeholder = "Buscar imágenes...";
+      }, 1000);
+    }
+
+    busqueda.value = "";
+  });
+
+  const validar = (busqueda) => {
+    busqueda = busqueda.trim();
+
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+
+    return regex.test(busqueda);
+  };
 
   // Funciones
 
