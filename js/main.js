@@ -103,6 +103,9 @@ document.addEventListener("DOMContentLoaded", () => {
    * @description Muestra las categorías en la galería.
    */
   const mostrarCategorias = async () => {
+    const botoneraExistente = document.querySelector(".botonera");
+    if (botoneraExistente) botoneraExistente.remove();
+
     galeria.className = "galeria categorias__container";
     galeria.innerHTML = "";
 
@@ -157,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      crearContenidoImg(categoria, data.photos);
+      crearContenidoImg(categoria, data);
     } catch (err) {
       console.error("Error al obtener las imagenes:", err);
       galeria.innerHTML = `<p class="texto-centrado--error">Error al cargar imágenes.</p>`;
@@ -204,14 +207,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fragment.append(filtroContainer);
 
-    const filtroSelect = filtroContainer.querySelector("#filtro-orientacion");
-    filtroSelect.addEventListener("change", () =>
-      mostrarImagenes(imgData, filtroSelect.value)
-    );
-
     galeria.append(fragment);
 
-    mostrarImagenes(imgData, "all");
+    mostrarImagenes(imgData.photos, "all");
+
+    let totalPaginas = Math.ceil(imgData.total_results / imgData.per_page);
+    totalPaginas = Math.min(totalPaginas, 10);
+
+    crearBotones(totalPaginas, categoria);
+
+    const filtroSelect = filtroContainer.querySelector("#filtro-orientacion");
+    filtroSelect.addEventListener("change", async () => {
+      const orientacion = filtroSelect.value;
+      mostrarImagenes(imgData.photos, orientacion);
+    });
   };
 
   /**
@@ -254,11 +263,74 @@ document.addEventListener("DOMContentLoaded", () => {
 
         link.append(elementoFigure);
 
-        fragment.appendChild(link);
+        fragment.append(link);
       }
     });
 
     galeria.append(fragment);
+  };
+
+  /**
+   * @description Crea los botones de paginación.
+   * @param {*} paginas Número de páginas
+   * @param {*} categoria Categoría de imágenes
+   */
+  const crearBotones = (paginas, categoria) => {
+    const botonera = document.createElement("DIV");
+    botonera.classList.add("botonera");
+
+    for (let i = 1; i <= paginas; i++) {
+      const boton = document.createElement("BUTTON");
+      boton.textContent = i;
+      boton.classList.add("btnPaginas");
+
+      boton.addEventListener("click", async () => {
+        await cargarPagina(categoria, i);
+
+        document
+          .querySelectorAll(".btnPaginas")
+          .forEach((b) => b.classList.remove("btnPaginas--activo"));
+
+        boton.classList.add("btnPaginas--activo");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      botonera.append(boton);
+    }
+
+    galeria.insertAdjacentElement("afterend", botonera);
+
+    const primerBoton = botonera.querySelector(".btnPaginas");
+    if (primerBoton) primerBoton.classList.add("btnPaginas--activo");
+  };
+
+  /**
+   * @description Carga una página de imágenes.
+   * @param {*} categoria Categoría de imágenes
+   * @param {*} pagina Número de página
+   * @returns {void}
+   */
+  const cargarPagina = async (categoria, pagina) => {
+    try {
+      const respuesta = await fetch(
+        `https://api.pexels.com/v1/search?page=${pagina}&per_page=80&query=${categoria}`,
+        {
+          headers: { Authorization: PEXELS_API_KEY },
+        }
+      );
+
+      if (!respuesta.ok) {
+        console.error("Error en cargar página");
+        return;
+      }
+
+      const data = await respuesta.json();
+
+      mostrarImagenes(data.photos, "all");
+    } catch (error) {
+      console.error("Error al cargar página:", error);
+    }
   };
 
   // Invocacion inicial
