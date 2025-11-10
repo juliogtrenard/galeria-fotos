@@ -22,7 +22,7 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 60;
 }
 
 .nav__container {
@@ -75,7 +75,7 @@ body {
 
 .busqueda--error {
   background-color: rgba(255, 101, 101, 0.595);
-  animation: error 0.5s;
+  animation: error 0.8s;
 }
 
 @keyframes error {
@@ -83,31 +83,31 @@ body {
     transform: translateX(0);
   }
   10% {
-    transform: translateX(-5px);
+    transform: translateX(-8px);
   }
   20% {
-    transform: translateX(5px);
+    transform: translateX(8px);
   }
   30% {
-    transform: translateX(-5px);
+    transform: translateX(-8px);
   }
   40% {
-    transform: translateX(5px);
+    transform: translateX(8px);
   }
   50% {
-    transform: translateX(-5px);
+    transform: translateX(-8px);
   }
   60% {
-    transform: translateX(5px);
+    transform: translateX(8px);
   }
   70% {
-    transform: translateX(-5px);
+    transform: translateX(-8px);
   }
   80% {
-    transform: translateX(5px);
+    transform: translateX(8px);
   }
   90% {
-    transform: translateX(-5px);
+    transform: translateX(-8px);
   }
   100% {
     transform: translateX(0);
@@ -176,6 +176,19 @@ body {
     rgba(255, 255, 255, 0) 100%
   );
   transition: 0.3s;
+}
+
+.icon-fav {
+  position: absolute;
+  font-size: 2rem;
+  top: 0;
+  right: 0;
+  z-index: 40;
+  filter: grayscale(1);
+}
+
+.check {
+  filter: grayscale(0);
 }
 
 /* ---------- Botón de volver ---------- */
@@ -357,6 +370,89 @@ body {
 
 .galeria.galeria--vertical {
   gap: 10px;
+}
+
+/* Modal de favoritos */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 80;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 80%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: aparecer 0.3s ease-out;
+}
+
+.modal__cerrar {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.modal__contenedor {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.modal__card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 0.5rem;
+  text-align: center;
+  position: relative;
+}
+
+.modal__card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.modal__eliminar {
+  margin-top: 0.4rem;
+  background: #ff4c4c;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal__eliminar:hover {
+  background: #e63946;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ---------- Media ---------- */

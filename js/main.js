@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Variables
   const galeria = document.querySelector(".galeria");
   const formulario = document.querySelector(".nav__busqueda");
+  const btnFavoritos = document.querySelector(".nav__fav-btn");
   let coleccionesFiltradas = [];
   let categoriasRandom = [];
   const fragment = document.createDocumentFragment();
@@ -31,6 +32,19 @@ document.addEventListener("DOMContentLoaded", () => {
     busqueda.value = "";
   });
 
+  btnFavoritos.addEventListener("click", () => {
+    let favoritos = obtenerFavoritos();
+
+    mostrarFavoritos(favoritos);
+  });
+
+  // Funciones
+
+  /**
+   * @description Valida la entrada de búsqueda para permitir solo letras y espacios.
+   * @param {*} busqueda Texto de búsqueda a validar
+   * @returns {boolean} Verdadero si la búsqueda es válida, falso en caso contrario.
+   */
   const validar = (busqueda) => {
     busqueda = busqueda.trim();
 
@@ -38,8 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return regex.test(busqueda);
   };
-
-  // Funciones
 
   /**
    * @description Obtiene las colecciones de imágenes de Pexels.
@@ -282,6 +294,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const elementoFigure = document.createElement("FIGURE");
         elementoFigure.classList.add("galeria__miniatura");
 
+        const favorito = document.createElement("DIV");
+        favorito.classList.add("icon-fav");
+        favorito.textContent = "🌟";
+        elementoFigure.append(favorito);
+
+        favorito.addEventListener("click", () => {
+          favorito.classList.toggle("check");
+
+          if (favorito.classList.contains("check")) {
+            guardarFavorito(img);
+          } else {
+            eliminarFavorito(img);
+          }
+        });
+
         const imagen = document.createElement("IMG");
         imagen.src = img.src.large;
         imagen.alt = img.alt || "Foto";
@@ -363,6 +390,95 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error("Error al cargar página:", error);
     }
+  };
+
+  /**
+   * @description Guarda una imagen en la lista de favoritos.
+   * @param {*} img Imagen a guardar en favoritos
+   */
+  const guardarFavorito = (img) => {
+    let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+    if (!favoritos.some((f) => f.src.large === img.src.large)) {
+      favoritos.push(img);
+      localStorage.setItem("favoritos", JSON.stringify(favoritos));
+    }
+  };
+
+  /**
+   * @description Elimina una imagen de la lista de favoritos.
+   * @param {*} img Imagen a eliminar de favoritos
+   */
+  const eliminarFavorito = (img) => {
+    let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+    favoritos = favoritos.filter((f) => f.src.large !== img.src.large);
+    localStorage.setItem("favoritos", JSON.stringify(favoritos));
+  };
+
+  /**
+   * @description Obtiene la lista de imágenes favoritas desde localStorage.
+   * @returns {Array} Lista de imágenes favoritas
+   */
+  const obtenerFavoritos = () => {
+    return JSON.parse(localStorage.getItem("favoritos")) || [];
+  };
+
+  /**
+   * @description Muestra una ventana modal con las imágenes favoritas.
+   * @param {Array} favoritos Lista de imágenes guardadas en favoritos.
+   */
+  const mostrarFavoritos = (favoritos) => {
+    if (favoritos.length === 0) {
+      return;
+    }
+
+    const modalOverlay = document.createElement("DIV");
+    modalOverlay.classList.add("modal-overlay");
+
+    const modal = document.createElement("DIV");
+    modal.classList.add("modal");
+
+    const btnCerrar = document.createElement("BUTTON");
+    btnCerrar.classList.add("modal__cerrar");
+    btnCerrar.textContent = "✖";
+    btnCerrar.addEventListener("click", () => modalOverlay.remove());
+    modal.append(btnCerrar);
+
+    const titulo = document.createElement("H2");
+    titulo.textContent = "Tus Favoritos";
+    modal.append(titulo);
+
+    const contenedor = document.createElement("DIV");
+    contenedor.classList.add("modal__contenedor");
+
+    favoritos.forEach((img) => {
+      const card = document.createElement("DIV");
+      card.classList.add("modal__card");
+
+      const imagen = document.createElement("IMG");
+      imagen.src = img.src.large;
+      imagen.alt = img.alt || "Foto favorita";
+
+      const caption = document.createElement("P");
+      caption.textContent = `Por ${img.photographer}`;
+
+      const btnEliminar = document.createElement("BUTTON");
+      btnEliminar.classList.add("modal__eliminar");
+      btnEliminar.textContent = "Quitar";
+
+      btnEliminar.addEventListener("click", () => {
+        eliminarFavorito(img);
+        card.remove();
+
+        if (contenedor.children.length === 0) modalOverlay.remove();
+      });
+
+      card.append(imagen, caption, btnEliminar);
+      contenedor.append(card);
+    });
+
+    modal.append(contenedor);
+    modalOverlay.append(modal);
+    document.body.append(modalOverlay);
   };
 
   // Invocacion inicial
