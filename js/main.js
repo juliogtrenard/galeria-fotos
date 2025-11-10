@@ -134,6 +134,133 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  /**
+   * @description Obtiene las imágenes de una categoría específica.
+   * @param {*} categoria Categoría de imágenes a obtener
+   * @returns {void}
+   */
+  const obtenerImagenes = async (categoria) => {
+    try {
+      galeria.innerHTML = `<p class="texto-centrado">Cargando imágenes...</p>`;
+
+      const respuesta = await fetch(
+        `https://api.pexels.com/v1/search?query=${categoria}&per_page=80`,
+        {
+          headers: { Authorization: PEXELS_API_KEY },
+        }
+      );
+
+      const data = await respuesta.json();
+
+      if (!data.photos || data.photos.length === 0) {
+        galeria.innerHTML = `<p class="texto-centrado">No se encontraron imágenes de ${categoria}.</p>`;
+        return;
+      }
+
+      crearContenidoImg(categoria, data.photos);
+    } catch (err) {
+      console.error("Error al obtener las imagenes:", err);
+      galeria.innerHTML = `<p class="texto-centrado--error">Error al cargar imágenes.</p>`;
+    }
+  };
+
+  /**
+   * @description Crea el contenido de imágenes para una categoría específica.
+   * @param {*} categoria Categoría de imágenes
+   * @param {*} imgData Datos de las imágenes
+   */
+  const crearContenidoImg = async (categoria, imgData) => {
+    galeria.className = "galeria";
+    galeria.innerHTML = "";
+
+    const volverBtn = document.createElement("BUTTON");
+    volverBtn.textContent = "⬅ Volver a categorías";
+    volverBtn.classList.add("volver-btn");
+    volverBtn.addEventListener("click", mostrarCategorias);
+    fragment.append(volverBtn);
+
+    const filtroContainer = document.createElement("DIV");
+    filtroContainer.classList.add("filtro__container");
+
+    const etiqueta = document.createElement("LABEL");
+    etiqueta.htmlFor = "filtro-orientacion";
+    etiqueta.textContent = "Mostrar: ";
+    filtroContainer.append(etiqueta);
+
+    const seleccionar = document.createElement("SELECT");
+    seleccionar.id = "filtro-orientacion";
+    const opciones = [
+      { value: "all", texto: "Todas" },
+      { value: "horizontal", texto: "Horizontales" },
+      { value: "vertical", texto: "Verticales" },
+    ];
+    opciones.forEach((op) => {
+      const opcion = document.createElement("OPTION");
+      opcion.value = op.value;
+      opcion.textContent = op.texto;
+      seleccionar.append(opcion);
+    });
+    filtroContainer.append(seleccionar);
+
+    fragment.append(filtroContainer);
+
+    const filtroSelect = filtroContainer.querySelector("#filtro-orientacion");
+    filtroSelect.addEventListener("change", () =>
+      mostrarImagenes(imgData, filtroSelect.value)
+    );
+
+    galeria.append(fragment);
+
+    mostrarImagenes(imgData, "all");
+  };
+
+  /**
+   * @description Muestra las imágenes filtradas en la galería.
+   * @param {*} imgData Datos de las imágenes
+   * @param {*} filtro Filtro de orientación ("all", "horizontal", "vertical")
+   */
+  const mostrarImagenes = (imgData, filtro = "all") => {
+    const existentes = document.querySelectorAll(".galeria__link");
+    existentes.forEach((el) => el.remove());
+
+    const galeriaClassList = galeria.classList;
+    galeriaClassList.remove("galeria--horizontal", "galeria--vertical");
+
+    if (filtro === "horizontal") galeriaClassList.add("galeria--horizontal");
+    else if (filtro === "vertical") galeriaClassList.add("galeria--vertical");
+
+    imgData.forEach((img) => {
+      const orientation = img.width >= img.height ? "horizontal" : "vertical";
+
+      if (filtro === "all" || filtro === orientation) {
+        const link = document.createElement("A");
+        link.href = img.photographer_url;
+        link.target = "_blank";
+        link.classList.add("galeria__link");
+
+        const elementoFigure = document.createElement("FIGURE");
+        elementoFigure.classList.add("galeria__miniatura");
+
+        const imagen = document.createElement("IMG");
+        imagen.src = img.src.large;
+        imagen.alt = img.alt || "Foto";
+        imagen.classList.add("galeria__img");
+        elementoFigure.append(imagen);
+
+        const elementoFigcaption = document.createElement("FIGCAPTION");
+        elementoFigcaption.classList.add("galeria__caption");
+        elementoFigcaption.textContent = `Foto por ${img.photographer}`;
+        elementoFigure.append(elementoFigcaption);
+
+        link.append(elementoFigure);
+
+        fragment.appendChild(link);
+      }
+    });
+
+    galeria.append(fragment);
+  };
+
   // Invocacion inicial
   inicializarCategorias();
 });
