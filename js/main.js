@@ -299,7 +299,9 @@ document.addEventListener("DOMContentLoaded", () => {
         favorito.textContent = "🌟";
         elementoFigure.append(favorito);
 
-        favorito.addEventListener("click", () => {
+        favorito.addEventListener("click", (ev) => {
+          ev.preventDefault();
+
           favorito.classList.toggle("check");
 
           if (favorito.classList.contains("check")) {
