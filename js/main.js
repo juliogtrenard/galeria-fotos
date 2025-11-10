@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const galeria = document.querySelector(".galeria");
   let coleccionesFiltradas = [];
   let categoriasRandom = [];
+  const fragment = document.createDocumentFragment();
   const PEXELS_API_KEY =
     "ZOVklWfofO0RAya4Id41GDeAMk4RS3ga4NWRljgtcElZFXdkiyv5Iaeu";
 
@@ -74,4 +75,65 @@ document.addEventListener("DOMContentLoaded", () => {
       return [];
     }
   };
+
+  /**
+   * @description Inicializa las categorías seleccionando aleatoriamente 3 colecciones.
+   */
+  const inicializarCategorias = async () => {
+    const colecciones = await obtenerColecciones();
+
+    coleccionesFiltradas = filtrarColecciones(colecciones, 50);
+
+    for (let i = 0; i < 3; i++) {
+      let numRandom;
+      let coleccionRandom;
+
+      do {
+        numRandom = Math.floor(Math.random() * coleccionesFiltradas.length);
+        coleccionRandom = coleccionesFiltradas[numRandom];
+      } while (categoriasRandom.includes(coleccionRandom));
+
+      categoriasRandom.push(coleccionRandom);
+    }
+
+    mostrarCategorias();
+  };
+
+  /**
+   * @description Muestra las categorías en la galería.
+   */
+  const mostrarCategorias = async () => {
+    galeria.className = "galeria categorias__container";
+    galeria.innerHTML = "";
+
+    try {
+      for (const cat of categoriasRandom) {
+        const fotos = await obtenerFotosDeColeccion(cat.id);
+
+        const imagenUrl = fotos[0].src.medium;
+
+        const card = document.createElement("DIV");
+        card.classList.add("categoria__card");
+        const imagen = document.createElement("IMG");
+        imagen.src = imagenUrl;
+        imagen.alt = cat.title;
+        card.append(imagen);
+        const nombre = document.createElement("DIV");
+        nombre.classList.add("categoria__nombre");
+        nombre.textContent = cat.title;
+        card.append(nombre);
+
+        card.addEventListener("click", () => obtenerImagenes(cat.title));
+
+        fragment.append(card);
+      }
+
+      galeria.append(fragment);
+    } catch (error) {
+      console.error("Error al mostrar las categorías:", error);
+    }
+  };
+
+  // Invocacion inicial
+  inicializarCategorias();
 });
