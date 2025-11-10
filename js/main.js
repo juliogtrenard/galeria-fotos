@@ -282,6 +282,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtro === "horizontal") galeriaClassList.add("galeria--horizontal");
     else if (filtro === "vertical") galeriaClassList.add("galeria--vertical");
 
+    const favoritosActuales = obtenerFavoritos();
+
     imgData.forEach((img) => {
       const orientation = img.width >= img.height ? "horizontal" : "vertical";
 
@@ -297,6 +299,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const favorito = document.createElement("DIV");
         favorito.classList.add("icon-fav");
         favorito.textContent = "🌟";
+
+        const esFavorito = favoritosActuales.some(
+          (f) => f.src.large === img.src.large
+        );
+        if (esFavorito) {
+          favorito.classList.add("check");
+        }
+
         elementoFigure.append(favorito);
 
         favorito.addEventListener("click", (ev) => {
