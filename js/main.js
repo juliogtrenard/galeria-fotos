@@ -340,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (filtro === "all" || filtro === orientation) {
         const link = document.createElement("A");
-        link.href = img.photographer_url;
+        link.href = img.src.original;
         link.target = "_blank";
         link.classList.add("galeria__link");
 
