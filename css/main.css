@@ -140,6 +140,7 @@ body {
   gap: 5px;
   padding: 5px;
   transition: 0.3s;
+  min-height: 70vh;
 }
 
 .galeria:hover .galeria__img {
@@ -229,14 +230,39 @@ body {
 }
 
 /* ---------- Categorías ---------- */
+.categorias__header {
+  text-align: center;
+  padding: 0 20px;
+  margin: 20px auto;
+  max-width: 900px;
+}
+
+.categorias__footer {
+  text-align: center;
+  padding: 0 20px;
+  margin: 25px auto;
+  max-width: 900px;
+}
+
+.categorias__header h2 {
+  color: #0077ff;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.categorias__header p,
+.categorias__footer p {
+  color: #555;
+  font-size: 1rem;
+}
+
 .categorias__container {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 40px;
-  padding: 60px 20px;
+  padding: 0 20px;
   flex-wrap: wrap;
-  min-height: calc(100vh - 100px);
 }
 
 .categoria__card {

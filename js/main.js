@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const galeria = document.querySelector(".galeria");
   const formulario = document.querySelector(".nav__busqueda");
   const btnFavoritos = document.querySelector(".nav__fav-btn");
+  const main = document.querySelector("main");
   let coleccionesFiltradas = [];
   let categoriasRandom = [];
   const fragment = document.createDocumentFragment();
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let busqueda = formulario.elements["search"];
 
     if (validar(busqueda.value)) {
+      eliminarHeaderFooter();
       obtenerImagenes(busqueda.value);
       const botoneraExistente = document.querySelector(".botonera");
       if (botoneraExistente) botoneraExistente.remove();
@@ -116,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     coleccionesFiltradas = filtrarColecciones(colecciones, 50);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       let numRandom;
       let coleccionRandom;
 
@@ -132,9 +134,61 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /**
+   * @description Crea el header de las categorías
+   */
+  const crearHeaderCategorias = () => {
+    eliminarHeaderFooter();
+
+    const header = document.createElement("SECTION");
+    header.classList.add("categorias__header");
+
+    const titulo = document.createElement("H2");
+    titulo.textContent = "Categorías destacadas";
+
+    const subtitulo = document.createElement("P");
+    subtitulo.textContent = "Explora las colecciones más populares de Pexels";
+
+    header.append(titulo, subtitulo);
+    main.insertBefore(header, galeria);
+  };
+
+  /**
+   * @description Crea el footer que aparece en la galería
+   */
+  const crearFooterGaleria = () => {
+    eliminarHeaderFooter();
+
+    const footer = document.createElement("SECTION");
+    footer.classList.add("categorias__footer");
+
+    const titulo = document.createElement("H3");
+    titulo.textContent = "¿No encuentras lo que buscas?";
+
+    const subtitulo = document.createElement("P");
+    subtitulo.textContent =
+      "Utiliza la barra de búsqueda para encontrar lo que quieras.";
+
+    footer.append(titulo, subtitulo);
+    main.append(footer);
+  };
+
+  /**
+   * @description Elimina cualquier header o footer existente
+   */
+  const eliminarHeaderFooter = () => {
+    const header = document.querySelector(".categorias__header");
+    const footer = document.querySelector(".categorias__footer");
+    if (header) header.remove();
+    if (footer) footer.remove();
+  };
+
+  /**
    * @description Muestra las categorías en la galería.
    */
   const mostrarCategorias = async () => {
+    eliminarHeaderFooter();
+    crearHeaderCategorias();
+
     const botoneraExistente = document.querySelector(".botonera");
     if (botoneraExistente) botoneraExistente.remove();
 
@@ -168,7 +222,10 @@ document.addEventListener("DOMContentLoaded", () => {
         nombre.textContent = cat.title;
         card.append(nombre);
 
-        card.addEventListener("click", () => obtenerImagenes(cat.title));
+        card.addEventListener("click", () => {
+          eliminarHeaderFooter();
+          obtenerImagenes(cat.title);
+        });
 
         fragment.append(card);
       }
@@ -204,6 +261,8 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {Object} imgData Datos de las imágenes
    */
   const crearContenidoImg = async (categoria, imgData) => {
+    crearFooterGaleria();
+
     galeria.className = "galeria";
     galeria.innerHTML = "";
 
