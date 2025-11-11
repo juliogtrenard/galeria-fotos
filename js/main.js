@@ -195,6 +195,8 @@ document.addEventListener("DOMContentLoaded", () => {
     galeria.className = "galeria categorias__container";
     galeria.innerHTML = "";
 
+    galeria.innerHTML = `<div class="spinner"></div>`;
+
     try {
       for (const cat of categoriasRandom) {
         const fotos = await obtenerFotosDeColeccion(cat.id);
@@ -233,6 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
       galeria.append(fragment);
     } catch (error) {
       console.error("Error al mostrar las categorías:", error);
+    } finally {
+      const spinner = galeria.querySelector(".spinner");
+      if (spinner) spinner.remove();
     }
   };
 
