@@ -16,7 +16,7 @@ Endpoints utilizados en el proyecto:
 
 #### Obtener colecciones
 
-```http
+```
   GET https://api.pexels.com/v1/collections/featured?page=${pagina}&per_page=${total}
 ```
 
@@ -27,7 +27,7 @@ Endpoints utilizados en el proyecto:
 
 #### Obtener fotos de una colección
 
-```http
+```
   GET https://api.pexels.com/v1/collections/${idColeccion}?type=photos
 ```
 
@@ -37,7 +37,7 @@ Endpoints utilizados en el proyecto:
 
 #### Obtener los objetos de una categoría
 
-```http
+```
   GET https://api.pexels.com/v1/search?query=${categoria}&per_page=78
 ```
 
@@ -47,7 +47,7 @@ Endpoints utilizados en el proyecto:
 
 #### Obtener las páginas de una categoría
 
-```http
+```
   GET https://api.pexels.com/v1/search?page=${pagina}&per_page=78&query=${categoria}
 ```
 
