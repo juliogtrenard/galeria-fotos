@@ -185,9 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
    * @returns {void}
    */
   const obtenerImagenes = async (categoria) => {
-    galeria.innerHTML = `<p class="texto-centrado">Cargando imágenes...</p>`;
+    galeria.innerHTML = `<div class="spinner"></div>`;
     const data = await apiFetch(
-      `https://api.pexels.com/v1/search?query=${categoria}&per_page=80`
+      `https://api.pexels.com/v1/search?query=${categoria}&per_page=78`
     );
 
     if (!data || !data.photos || data.photos.length === 0) {
@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   const cargarPagina = async (categoria, pagina) => {
     const data = await apiFetch(
-      `https://api.pexels.com/v1/search?page=${pagina}&per_page=80&query=${categoria}`
+      `https://api.pexels.com/v1/search?page=${pagina}&per_page=78&query=${categoria}`
     );
     if (data) mostrarImagenes(data.photos, "all");
   };
