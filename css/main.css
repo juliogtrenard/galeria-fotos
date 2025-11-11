@@ -67,6 +67,7 @@ body {
   font-size: 0.9rem;
   cursor: pointer;
   transition: 0.3s;
+  margin-top: 10px;
 }
 
 .nav__fav-btn:hover {
@@ -195,7 +196,7 @@ body {
 .volver-btn {
   grid-column: 1 / -1;
   padding: 0.8rem 1.2rem;
-  margin-bottom: 10px;
+  margin: 10px 0;
   border: none;
   background-color: #0077ff;
   color: white;
@@ -477,6 +478,10 @@ body {
   .nav__busqueda {
     flex: 1;
     text-align: center;
+  }
+
+  .nav__fav-btn {
+    margin-top: 0;
   }
 }
 

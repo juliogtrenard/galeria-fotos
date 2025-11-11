@@ -41,8 +41,28 @@ document.addEventListener("DOMContentLoaded", () => {
   // Funciones
 
   /**
+   * @description Realiza una petición a la API de Pexels.
+   * @param {string} endpoint URL del endpoint de la API
+   * @returns {Object} Datos obtenidos de la API
+   */
+  const apiFetch = async (endpoint) => {
+    try {
+      const respuesta = await fetch(endpoint, {
+        headers: { Authorization: PEXELS_API_KEY },
+      });
+
+      if (!respuesta.ok) throw new Error("Error en la petición a la API");
+
+      return await respuesta.json();
+    } catch (error) {
+      console.error("Error en apiFetch:", error);
+      return null;
+    }
+  };
+
+  /**
    * @description Valida la entrada de búsqueda para permitir solo letras y espacios.
-   * @param {*} busqueda Texto de búsqueda a validar
+   * @param {string} busqueda Texto de búsqueda a validar
    * @returns {boolean} Verdadero si la búsqueda es válida, falso en caso contrario.
    */
   const validar = (busqueda) => {
@@ -54,39 +74,20 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /**
-   * @description Obtiene las colecciones de imágenes de Pexels.
-   * @param {*} pagina Pagina de colecciones a obtener
-   * @param {*} total Total de colecciones a obtener
+   * @description Obtiene las colecciones a usar como categorías.
+   * @param {number} pagina Página de resultados
+   * @param {number} total Total de colecciones a obtener de esa página
    * @returns {Object} Datos de las colecciones obtenidas
    */
   const obtenerColecciones = async (pagina = 1, total = 50) => {
-    try {
-      const respuesta = await fetch(
-        `https://api.pexels.com/v1/collections/featured?page=${pagina}&per_page=${total}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: PEXELS_API_KEY,
-          },
-        }
-      );
-
-      if (!respuesta.ok) {
-        throw new Error("Error al obtener las colecciones");
-      }
-
-      const datos = await respuesta.json();
-      return datos;
-    } catch (error) {
-      console.error("Error en obtenerColecciones", error);
-      return null;
-    }
+    const endpoint = `https://api.pexels.com/v1/collections/featured?page=${pagina}&per_page=${total}`;
+    return apiFetch(endpoint);
   };
 
   /**
-   * @description Filtra las colecciones de imágenes según un número mínimo de fotos.
-   * @param {*} colecciones Colecciones a filtrar
-   * @param {*} filtro Número mínimo de fotos por colección
+   * @description Filtra las colecciones que tienen al menos un número mínimo de fotos.
+   * @param {Object} colecciones Datos de las colecciones
+   * @param {number} filtro Número mínimo de fotos para filtrar
    * @returns {Array} Colecciones filtradas
    */
   const filtrarColecciones = (colecciones, filtro) => {
@@ -97,27 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Obtiene las fotos de una colección específica.
-   * @param {*} idColeccion ID de la colección a obtener
+   * @param {string} idColeccion ID de la colección a obtener
    * @returns {Array} Fotos de la colección
    */
   const obtenerFotosDeColeccion = async (idColeccion) => {
-    try {
-      const respuesta = await fetch(
-        `https://api.pexels.com/v1/collections/${idColeccion}?type=photos`,
-        {
-          headers: { Authorization: PEXELS_API_KEY },
-        }
-      );
-
-      if (!respuesta.ok)
-        throw new Error("Error al obtener fotos de la colección");
-
-      const datos = await respuesta.json();
-      return datos.media;
-    } catch (error) {
-      console.error("Error en obtenerFotosDeColeccion:", error);
-      return [];
-    }
+    const data = await apiFetch(
+      `https://api.pexels.com/v1/collections/${idColeccion}?type=photos`
+    );
+    return data ? data.media : [];
   };
 
   /**
@@ -157,14 +145,24 @@ document.addEventListener("DOMContentLoaded", () => {
       for (const cat of categoriasRandom) {
         const fotos = await obtenerFotosDeColeccion(cat.id);
 
-        const imagenUrl = fotos[0].src.medium;
+        const imagenUrls = fotos.slice(0, 11).map((f) => f.src.medium);
 
         const card = document.createElement("DIV");
         card.classList.add("categoria__card");
+
         const imagen = document.createElement("IMG");
-        imagen.src = imagenUrl;
         imagen.alt = cat.title;
+        imagen.src = imagenUrls[0];
         card.append(imagen);
+
+        let index = 0;
+        if (imagenUrls.length > 1) {
+          setInterval(() => {
+            index = (index + 1) % imagenUrls.length;
+            imagen.src = imagenUrls[index];
+          }, 5000);
+        }
+
         const nombre = document.createElement("DIV");
         nombre.classList.add("categoria__nombre");
         nombre.textContent = cat.title;
@@ -183,38 +181,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Obtiene las imágenes de una categoría específica.
-   * @param {*} categoria Categoría de imágenes a obtener
+   * @param {string} categoria Categoría de imágenes a obtener
    * @returns {void}
    */
   const obtenerImagenes = async (categoria) => {
-    try {
-      galeria.innerHTML = `<p class="texto-centrado">Cargando imágenes...</p>`;
+    galeria.innerHTML = `<p class="texto-centrado">Cargando imágenes...</p>`;
+    const data = await apiFetch(
+      `https://api.pexels.com/v1/search?query=${categoria}&per_page=80`
+    );
 
-      const respuesta = await fetch(
-        `https://api.pexels.com/v1/search?query=${categoria}&per_page=80`,
-        {
-          headers: { Authorization: PEXELS_API_KEY },
-        }
-      );
-
-      const data = await respuesta.json();
-
-      if (!data.photos || data.photos.length === 0) {
-        galeria.innerHTML = `<p class="texto-centrado">No se encontraron imágenes de ${categoria}.</p>`;
-        return;
-      }
-
-      crearContenidoImg(categoria, data);
-    } catch (err) {
-      console.error("Error al obtener las imagenes:", err);
-      galeria.innerHTML = `<p class="texto-centrado--error">Error al cargar imágenes.</p>`;
+    if (!data || !data.photos || data.photos.length === 0) {
+      galeria.innerHTML = `<p class="texto-centrado--error">No se encontraron imágenes de ${categoria}.</p>`;
+      return;
     }
+
+    crearContenidoImg(categoria, data);
   };
 
   /**
    * @description Crea el contenido de imágenes para una categoría específica.
-   * @param {*} categoria Categoría de imágenes
-   * @param {*} imgData Datos de las imágenes
+   * @param {string} categoria Categoría de imágenes
+   * @param {Object} imgData Datos de las imágenes
    */
   const crearContenidoImg = async (categoria, imgData) => {
     galeria.className = "galeria";
@@ -269,8 +256,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Muestra las imágenes filtradas en la galería.
-   * @param {*} imgData Datos de las imágenes
-   * @param {*} filtro Filtro de orientación ("all", "horizontal", "vertical")
+   * @param {Object} imgData Datos de las imágenes
+   * @param {string} filtro Filtro de orientación ("all", "horizontal", "vertical")
    */
   const mostrarImagenes = (imgData, filtro = "all") => {
     const existentes = document.querySelectorAll(".galeria__link");
@@ -343,8 +330,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Crea los botones de paginación.
-   * @param {*} paginas Número de páginas
-   * @param {*} categoria Categoría de imágenes
+   * @param {number} paginas Número de páginas
+   * @param {string} categoria Categoría de imágenes
    */
   const crearBotones = (paginas, categoria) => {
     const botonera = document.createElement("DIV");
@@ -378,35 +365,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Carga una página de imágenes.
-   * @param {*} categoria Categoría de imágenes
-   * @param {*} pagina Número de página
+   * @param {string} categoria Categoría de imágenes
+   * @param {number} pagina Número de página
    * @returns {void}
    */
   const cargarPagina = async (categoria, pagina) => {
-    try {
-      const respuesta = await fetch(
-        `https://api.pexels.com/v1/search?page=${pagina}&per_page=80&query=${categoria}`,
-        {
-          headers: { Authorization: PEXELS_API_KEY },
-        }
-      );
-
-      if (!respuesta.ok) {
-        console.error("Error en cargar página");
-        return;
-      }
-
-      const data = await respuesta.json();
-
-      mostrarImagenes(data.photos, "all");
-    } catch (error) {
-      console.error("Error al cargar página:", error);
-    }
+    const data = await apiFetch(
+      `https://api.pexels.com/v1/search?page=${pagina}&per_page=80&query=${categoria}`
+    );
+    if (data) mostrarImagenes(data.photos, "all");
   };
 
   /**
    * @description Guarda una imagen en la lista de favoritos.
-   * @param {*} img Imagen a guardar en favoritos
+   * @param {Object} img Imagen a guardar en favoritos
    */
   const guardarFavorito = (img) => {
     let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
@@ -418,7 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Elimina una imagen de la lista de favoritos.
-   * @param {*} img Imagen a eliminar de favoritos
+   * @param {Object} img Imagen a eliminar de favoritos
    */
   const eliminarFavorito = (img) => {
     let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
