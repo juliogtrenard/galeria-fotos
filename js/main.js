@@ -527,6 +527,12 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.append(contenedor);
     modalOverlay.append(modal);
     document.body.append(modalOverlay);
+
+    window.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.remove();
+      }
+    });
   };
 
   // Invocacion inicial

@@ -58,6 +58,21 @@ body {
   box-shadow: 0 0 5px rgba(0, 119, 255, 0.3);
 }
 
+.nav__search-btn {
+  background-color: #0077ff;
+  border: none;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav__search-btn:hover {
+  background-color: #004ea8;
+}
+
 .nav__fav-btn {
   background-color: #ff3366;
   border: none;
