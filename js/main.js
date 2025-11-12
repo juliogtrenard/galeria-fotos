@@ -485,7 +485,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const titulo = document.createElement("H2");
     titulo.textContent = "Tus Favoritos";
-    modal.append(titulo);
+    const btnEliminarTodo=document.createElement('BUTTON');
+    btnEliminarTodo.textContent='ELIMINAR TODO';
+    btnEliminarTodo.classList.add('modal__eliminar')
+    btnEliminarTodo.addEventListener('click',()=>{
+      let favoritos = [];
+      localStorage.setItem("favoritos", JSON.stringify(favoritos));
+      modalOverlay.remove();
+    })
+    
+    modal.append(titulo,btnEliminarTodo);
 
     const contenedor = document.createElement("DIV");
     contenedor.classList.add("modal__contenedor");
