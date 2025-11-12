@@ -201,23 +201,15 @@ document.addEventListener("DOMContentLoaded", () => {
       for (const cat of categoriasRandom) {
         const fotos = await obtenerFotosDeColeccion(cat.id);
 
-        const imagenUrls = fotos.slice(0, 11).map((f) => f.src.medium);
+        const imagenUrl = fotos[0].src.large;
 
         const card = document.createElement("DIV");
         card.classList.add("categoria__card");
 
         const imagen = document.createElement("IMG");
         imagen.alt = cat.title;
-        imagen.src = imagenUrls[0];
+        imagen.src = imagenUrl;
         card.append(imagen);
-
-        let index = 0;
-        if (imagenUrls.length > 1) {
-          setInterval(() => {
-            index = (index + 1) % imagenUrls.length;
-            imagen.src = imagenUrls[index];
-          }, 5000);
-        }
 
         const nombre = document.createElement("DIV");
         nombre.classList.add("categoria__nombre");
