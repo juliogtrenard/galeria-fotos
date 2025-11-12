@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const obtenerImagenes = async (categoria) => {
     galeria.innerHTML = `<div class="spinner"></div>`;
     const data = await apiFetch(
-      `https://api.pexels.com/v1/search?query=${categoria}&per_page=78`
+      `https://api.pexels.com/v1/search?query=${categoria}&per_page=78&locale=es-ES`
     );
 
     if (!data || !data.photos || data.photos.length === 0) {
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
     mostrarImagenes(imgData.photos, "all");
 
     let totalPaginas = Math.ceil(imgData.total_results / imgData.per_page);
-    totalPaginas = Math.min(totalPaginas, 10);
+    //totalPaginas = Math.min(totalPaginas, 10);
 
     crearBotones(totalPaginas, categoria);
 
@@ -391,37 +391,111 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /**
    * @description Crea los botones de paginación.
-   * @param {number} paginas Número de páginas
-   * @param {string} categoria Categoría de imágenes
+   * @param {*} totalPaginas Total de páginas
+   * @param {*} categoria Categoría de imágenes
+   * @param {*} visibleBotones Número de botones visibles
    */
-  const crearBotones = (paginas, categoria) => {
+  const crearBotones = (totalPaginas, categoria, visibleBotones = 5) => {
+    const botoneraExistente = document.querySelector(".botonera");
+    if (botoneraExistente) botoneraExistente.remove();
+
     const botonera = document.createElement("DIV");
     botonera.classList.add("botonera");
 
-    for (let i = 1; i <= paginas; i++) {
-      const boton = document.createElement("BUTTON");
-      boton.textContent = i;
-      boton.classList.add("btnPaginas");
+    let paginaActual = 1;
+    let inicio = 1;
+    let fin = Math.min(visibleBotones, totalPaginas);
 
-      boton.addEventListener("click", async () => {
-        await cargarPagina(categoria, i);
+    /**
+     * @description Actualiza los botones de paginación.
+     */
+    const actualizarBotones = async () => {
+      botonera.innerHTML = "";
 
-        document
-          .querySelectorAll(".btnPaginas")
-          .forEach((b) => b.classList.remove("btnPaginas--activo"));
-
-        boton.classList.add("btnPaginas--activo");
-
+      const btnPrimero = document.createElement("BUTTON");
+      btnPrimero.textContent = "<<";
+      btnPrimero.disabled = paginaActual === 1;
+      btnPrimero.classList.add("btnPaginas");
+      btnPrimero.addEventListener("click", async () => {
+        paginaActual = 1;
+        inicio = 1;
+        fin = Math.min(visibleBotones, totalPaginas);
+        await cargarPagina(categoria, paginaActual);
+        actualizarBotones();
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
 
-      botonera.append(boton);
-    }
+      botonera.append(btnPrimero);
 
+      const btnAnterior = document.createElement("BUTTON");
+      btnAnterior.textContent = "<";
+      btnAnterior.disabled = paginaActual === 1;
+      btnAnterior.classList.add("btnPaginas");
+      btnAnterior.addEventListener("click", async () => {
+        if (paginaActual > 1) {
+          paginaActual--;
+          if (paginaActual < inicio) {
+            inicio--;
+            fin--;
+          }
+          await cargarPagina(categoria, paginaActual);
+          actualizarBotones();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
+      botonera.append(btnAnterior);
+
+      for (let i = inicio; i <= fin; i++) {
+        const btn = document.createElement("BUTTON");
+        btn.textContent = i;
+        btn.classList.add("btnPaginas");
+        if (i === paginaActual) btn.classList.add("btnPaginas--activo");
+        btn.addEventListener("click", async () => {
+          paginaActual = i;
+          await cargarPagina(categoria, paginaActual);
+          actualizarBotones();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+        botonera.append(btn);
+      }
+
+      const btnSiguiente = document.createElement("BUTTON");
+      btnSiguiente.textContent = ">";
+      btnSiguiente.disabled = paginaActual === totalPaginas;
+      btnSiguiente.classList.add("btnPaginas");
+      btnSiguiente.addEventListener("click", async () => {
+        if (paginaActual < totalPaginas) {
+          paginaActual++;
+          if (paginaActual > fin) {
+            inicio++;
+            fin++;
+          }
+          await cargarPagina(categoria, paginaActual);
+          actualizarBotones();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
+      botonera.append(btnSiguiente);
+
+      const btnUltima = document.createElement("BUTTON");
+      btnUltima.textContent = ">>";
+      btnUltima.disabled = paginaActual === totalPaginas;
+      btnUltima.classList.add("btnPaginas");
+      btnUltima.addEventListener("click", async () => {
+        paginaActual = totalPaginas;
+        fin = totalPaginas;
+        inicio = Math.max(1, totalPaginas - visibleBotones + 1);
+        await cargarPagina(categoria, paginaActual);
+        actualizarBotones();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      botonera.append(btnUltima);
+    };
+
+    actualizarBotones();
     galeria.insertAdjacentElement("afterend", botonera);
-
-    const primerBoton = botonera.querySelector(".btnPaginas");
-    if (primerBoton) primerBoton.classList.add("btnPaginas--activo");
   };
 
   /**
