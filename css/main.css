@@ -89,6 +89,10 @@ body {
   background-color: #fe0745;
 }
 
+.favoritos--vacio {
+  animation: error 0.8s;
+}
+
 .busqueda--error {
   background-color: rgba(255, 101, 101, 0.595);
   animation: error 0.8s;
@@ -341,7 +345,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.501);
   backdrop-filter: blur(8px);
   display: flex;
   flex-wrap: wrap;
@@ -354,7 +358,7 @@ body {
 }
 
 .btnPaginas {
-  background-color: #eee;
+  background-color: #53a3ff78;
   border: 1px solid #ccc;
   padding: 6px 12px;
   border-radius: 6px;
@@ -363,12 +367,12 @@ body {
 }
 
 .btnPaginas:hover {
-  background-color: #ddd;
+  background-color: #a3ceff;
   transform: translateY(-2px);
 }
 
 .btnPaginas--activo {
-  background-color: #0078ff;
+  background-color: rgb(255, 63, 63);
   color: white;
   border-color: #0078ff;
 }

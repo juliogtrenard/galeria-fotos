@@ -468,6 +468,11 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   const mostrarFavoritos = (favoritos) => {
     if (favoritos.length === 0) {
+      btnFavoritos.classList.toggle("favoritos--vacio");
+
+      setTimeout(() => {
+        btnFavoritos.classList.toggle("favoritos--vacio");
+      }, 1000);
       return;
     }
 
@@ -485,16 +490,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const titulo = document.createElement("H2");
     titulo.textContent = "Tus Favoritos";
-    const btnEliminarTodo=document.createElement('BUTTON');
-    btnEliminarTodo.textContent='ELIMINAR TODO';
-    btnEliminarTodo.classList.add('modal__eliminar')
-    btnEliminarTodo.addEventListener('click',()=>{
+    const btnEliminarTodo = document.createElement("BUTTON");
+    btnEliminarTodo.textContent = "ELIMINAR TODO";
+    btnEliminarTodo.classList.add("modal__eliminar");
+    btnEliminarTodo.addEventListener("click", () => {
       let favoritos = [];
       localStorage.setItem("favoritos", JSON.stringify(favoritos));
       modalOverlay.remove();
-    })
-    
-    modal.append(titulo,btnEliminarTodo);
+    });
+
+    modal.append(titulo, btnEliminarTodo);
 
     const contenedor = document.createElement("DIV");
     contenedor.classList.add("modal__contenedor");
