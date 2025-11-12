@@ -7,6 +7,33 @@
     <title>Galeria de fotos</title>
   </head>
   <body>
+    <!-- Zona de navegación con busqueda de imágenes y favoritos -->
+    <header class="nav">
+      <nav class="nav__container">
+        <a class="titulo__link" href="#"><h1 class="nav__titulo">Pexels</h1></a>
+
+        <form class="nav__busqueda">
+          <input
+            type="search"
+            id="search"
+            name="search"
+            placeholder="Buscar imágenes..."
+          />
+          <button class="nav__search-btn" type="submit">Buscar</button>
+        </form>
+
+        <button class="nav__fav-btn" type="button">🌟​ Favoritos</button>
+      </nav>
+    </header>
+
+    <!-- Zona donde se mostrarán las categorías -->
+    <main>
+      <section class="galeria">
+        <!-- Aquí se cargarán las imágenes de forma dinámica -->
+      </section>
+    </main>
+
+    <!-- Script -->
     <script src="js/main.js"></script>
   </body>
 </html>
