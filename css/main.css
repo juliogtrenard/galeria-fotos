@@ -38,6 +38,11 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.titulo__link {
+  text-decoration: none;
+  color: #0077ff;
+}
+
 .nav__busqueda {
   width: 100%;
   text-align: center;

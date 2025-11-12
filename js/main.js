@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // Variables
+  const tituloInicio = document.querySelector(".titulo__link");
   const galeria = document.querySelector(".galeria");
   const formulario = document.querySelector(".nav__busqueda");
   const btnFavoritos = document.querySelector(".nav__fav-btn");
@@ -11,6 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
     "ZOVklWfofO0RAya4Id41GDeAMk4RS3ga4NWRljgtcElZFXdkiyv5Iaeu";
 
   // Eventos
+  tituloInicio.addEventListener("click", () => {
+    mostrarCategorias();
+  });
+
   formulario.addEventListener("submit", (ev) => {
     ev.preventDefault();
 
